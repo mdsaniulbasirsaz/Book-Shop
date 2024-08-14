@@ -34,8 +34,7 @@ app.get('/login', (req, res) => res.sendFile(path.join(__dirname, 'public', 'log
 app.get('/order', (req, res) => res.sendFile(path.join(__dirname, 'public', 'order.html')));
 app.get('/signup', (req, res) => res.sendFile(path.join(__dirname, 'public', 'signup.html')));
 
-// Serve index.html for unmatched routes (SPA)
-app.get('*', (req, res) => res.sendFile(path.join(__dirname, 'public', 'index.html')));
+
 
 // Set up storage for multer
 const storage = multer.diskStorage({
@@ -48,6 +47,12 @@ const storage = multer.diskStorage({
   });
   
   const upload = multer({ storage: storage });
+app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
+app.post('/upload', upload.single('image'), (req, res) => {
+  res.send('File uploaded successfully!');
+});
+
+
 
 // Define Book Schema and Model
 const bookSchema = new mongoose.Schema({
@@ -56,15 +61,15 @@ const bookSchema = new mongoose.Schema({
   price: String,
   image: String,
 });
-const Book = mongoose.model('Book', bookSchema);
-module.exports = Book;
+const Collections = mongoose.model('Collections', bookSchema);
+module.exports = Collections;
 
 app.post('/addBook', upload.single('image'), async (req, res) => {
     try {
       const { bookname, author, price } = req.body;
       const image = req.file ? req.file.filename : ''; // Use the filename saved by multer
   
-      const newBook = new Book({ bookname, author, price, image });
+      const newBook = new Collections({ bookname, author, price, image });
       const savedBook = await newBook.save();
   
       console.log('Received data:', req.body);
@@ -76,6 +81,17 @@ app.post('/addBook', upload.single('image'), async (req, res) => {
     }
   });
  
+  app.get('/info', async (req, res) => {
+    try {
+      const bookinfo = await Collections.find(); 
+  
+      console.log('Fetched books:', bookinfo);
+  
+      res.status(200).json(bookinfo); 
+    } catch (error) {
+      res.status(500).send('Error fetching books: ' + error.message);
+    }
+  });
   
 
 
