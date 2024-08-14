@@ -4,9 +4,9 @@ const cors = require('cors');
 const multer = require('multer');
 const path = require('path');
 const bodyParser = require('body-parser');
-
 const app = express();
 const PORT = process.env.PORT || 3000;
+
 
 // Middleware
 app.use(bodyParser.json());
@@ -113,9 +113,73 @@ app.post('/addBook', upload.single('image'), async (req, res) => {
   });
   
 
+  //Sign up
+  const userCollection = new mongoose.Schema({
+      name: String,
+      username: String,
+      phone: String,
+      password: String,
+  });
 
+  const User = mongoose.model('User',userCollection);
+  module.exports = User;
 
-
+  app.post('/signup', async (req, res) => {
+    const { name, username, phone, password } = req.body;
+  
+    if (!name || !username || !phone || !password) {
+      return res.status(400).json({ message: 'All fields are required' });
+    }
+  
+    try {
+      const existingUser = await User.findOne({ $or: [{ username }, { phone }] });
+      if (existingUser) {
+        return res.status(400).json({ message: 'Username or phone already in use' });
+      }
+  
+      const newUser = new User({
+        name,
+        username,
+        phone,
+        password 
+      });
+  
+      await newUser.save();
+  
+      res.status(201).json({ message: 'User created successfully' });
+    } catch (error) {
+      console.error('Error creating user:', error); // Detailed logging
+      res.status(500).json({ message: 'Error creating user', error: error.message }); // Provide error message
+    }
+  });
+  
+  
+  //Login
+  app.post('/login', async (req, res) => {
+    const { username, password } = req.body;
+  
+    if (!username || !password) {
+      return res.status(400).json({ message: 'Username and password are required' });
+    }
+  
+    try {
+      const user = await User.findOne({ username });
+  
+      if (!user) {
+        return res.status(401).json({ message: 'Invalid username or password' });
+      }
+  
+      if (password !== user.password) {
+        return res.status(401).json({ message: 'Invalid username or password' });
+      }
+  
+      res.status(200).json({ message: 'Login successful' });
+    } catch (error) {
+      console.error('Error logging in:', error);
+      res.status(500).json({ message: 'Error logging in', error: error.message });
+    }
+  });
+  
 
 
 

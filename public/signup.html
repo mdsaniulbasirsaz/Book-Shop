@@ -16,6 +16,20 @@
             <a class="navbar-brand" href="/index">
                 <img src="/icons/Logo.png" width="90%" height="30" class="d-inline-block align-top" alt="" loading="lazy">
               </a>
+
+              <div class="collapse navbar-collapse">
+                <ul class="navbar-nav ml-auto">
+                    <li class="nav-item" id="userGreeting" style="display: none;">
+                        <span class="navbar-text" id="userName"></span>
+                    </li>
+                    <li class="nav-item" id="loginOption">
+                        <a class="nav-link" href="/login">Login</a>
+                    </li>
+                    <li class="nav-item" id="logoutOption" style="display: none;">
+                        <button class="btn btn-link nav-link" onclick="logout()">Logout</button>
+                    </li>
+                </ul>
+            </div>
           </nav>
     </div>
 
@@ -24,18 +38,22 @@
         <div class="card ml-4 mr-4 shadow">
             <div class="card-body">
               <h5 class="font-weight-bold">Create an account</h5>
-              <form class="mt-4">
+              <form class="mt-4" id="signupForm" method="post" action="/signup">
                 <div class="form-group">
-                    <label for="exampleInputEmail1">Name</label>
-                    <input type="text" class="form-control" id="name" aria-describedby="emailHelp">
+                    <label for="name">Name</label>
+                    <input type="text" class="form-control" id="name" aria-describedby="nameHelp" >
                 </div>
                 <div class="form-group">
-                  <label for="exampleInputEmail1">Username or email</label>
-                  <input type="text" class="form-control" id="username" aria-describedby="emailHelp">
+                  <label for="username">Username</label>
+                  <input type="text" class="form-control" id="username" aria-describedby="usernameHelp"  >
+                </div>
+                <div class="form-group">
+                  <label for="phone">Phone Number</label>
+                  <input type="text" class="form-control" id="phone" aria-describedby="phoneHelp" >
                 </div>
                 <div class="form-group">
                   <label for="exampleInputPassword1">Password</label>
-                  <input type="text" class="form-control" id="exampleInputPassword1">
+                  <input type="password" class="form-control" id="password" >
                 </div>
                 <p>Already have an account? <span><a href="/login" target="_self">Login</a></span></p>
                 <button type="submit" class="btn btn-primary">Sign up</button>
@@ -47,7 +65,38 @@
 
 
 
+    <script>
+      document.addEventListener('DOMContentLoaded', function() {
+          const username = localStorage.getItem('username');
+          const name = localStorage.getItem('name');
+          
+          console.log('Username from localStorage:', username);
+          console.log('Name from localStorage:', name);
 
+          if (username && name) {
+              document.getElementById('userGreeting').style.display = 'block';
+              document.getElementById('userName').textContent = `Welcome, ${name}`;
+              document.getElementById('loginOption').style.display = 'none';
+              document.getElementById('logoutOption').style.display = 'block';
+          } else {
+              document.getElementById('userGreeting').style.display = 'none';
+              document.getElementById('loginOption').style.display = 'block';
+              document.getElementById('logoutOption').style.display = 'none';
+          }
+      });
+
+      function logout() {
+          localStorage.removeItem('username');
+          localStorage.removeItem('name');
+          document.getElementById('userGreeting').style.display = 'none';
+          document.getElementById('loginOption').style.display = 'block';
+          document.getElementById('logoutOption').style.display = 'none';
+          window.location.href = '/login';
+      }
+  </script>
+
+
+<script src="/signup.js"></script>
     <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js" integrity="sha384-DfXdz2htPH0lsSSs5nCTpuj/zy4C+OGpamoFVy38MVBnE+IbbVYUew+OrCXaRkfj" crossorigin="anonymous"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.5.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-ho+j7jyWK8fNQe+A12Hb8AhRq26LrZ/JpcUGGOn+Y7RsweNrtN/tE3MoK7ZeZDyx" crossorigin="anonymous"></script> 
 </body>
