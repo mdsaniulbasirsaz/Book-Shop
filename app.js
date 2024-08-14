@@ -225,7 +225,16 @@ app.get('/api/getorder', async (req, res) => {
 });
 
 
-
+app.get('/api/getorder/:username', async (req, res) => {
+  try {
+      const { username } = req.params;
+      const orders = await Order.find({ username }).sort({ orderDate: -1 });
+      res.json(orders);
+  } catch (error) {
+      console.error('Error fetching orders:', error);
+      res.status(500).json({ error: 'An error occurred while fetching orders.' });
+  }
+});
 
 
 
