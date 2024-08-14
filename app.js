@@ -95,6 +95,36 @@ app.post('/addBook', upload.single('image'), async (req, res) => {
   
 
 
+  //Delete Book
+  app.delete('/delete-book', async (req, res) => {
+    try {
+      const { bookname } = req.body; 
+  
+      const result = await Collections.findOneAndDelete({ bookname: bookname });
+  
+      if (result) {
+        res.status(200).json({ message: 'Book deleted successfully' });
+      } else {
+        res.status(404).json({ message: 'Book not found' });
+      }
+    } catch (error) {
+      res.status(500).json({ message: 'Error deleting book', error });
+    }
+  });
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
