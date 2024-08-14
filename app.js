@@ -180,10 +180,49 @@ app.post('/addBook', upload.single('image'), async (req, res) => {
     }
   });
   
+//Order
+const orderSchema = new mongoose.Schema({
+    username: String,
+    bookname: String,
+    author: String,
+    price: String,
+    orderDate:{
+      type:Date,
+      default:Date.now
+    }
+});
+const Order = mongoose.model('Order',orderSchema);
+module.exports = Order;
 
 
+app.post('/api/saveBook', async (req, res) => {
+  try {
+    const { username, bookname, author, price } = req.body;
 
+    const newOrder = new Order({
+      username: username,
+      bookname: bookname,
+      author: author,
+      price: price
+    });
 
+    await newOrder.save();
+
+    res.json({ message: 'Book saved successfully!' });
+  } catch (error) {
+    console.error('Error saving book:', error);
+    res.status(500).json({ message: 'Error saving book' });
+  }
+});
+app.get('/api/getorder', async (req, res) => {
+  try {
+    const books = await Order.find();
+    res.json(books);
+  } catch (error) {
+    console.error('Error retrieving books:', error);
+    res.status(500).json({ message: 'Error retrieving books' });
+  }
+});
 
 
 
