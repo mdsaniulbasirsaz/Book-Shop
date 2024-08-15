@@ -33,6 +33,7 @@ app.get('/index', (req, res) => res.sendFile(path.join(__dirname, 'public', 'ind
 app.get('/login', (req, res) => res.sendFile(path.join(__dirname, 'public', 'login.html')));
 app.get('/order', (req, res) => res.sendFile(path.join(__dirname, 'public', 'order.html')));
 app.get('/signup', (req, res) => res.sendFile(path.join(__dirname, 'public', 'signup.html')));
+app.get('/adminlogin', (req, res) => res.sendFile(path.join(__dirname, 'public', 'adminlogin.html')));
 
 
 
@@ -235,6 +236,53 @@ app.get('/api/getorder/:username', async (req, res) => {
       res.status(500).json({ error: 'An error occurred while fetching orders.' });
   }
 });
+
+
+const adminloginSchema = new mongoose.Schema({
+  email: String,
+  password: String,
+});
+const adminlogin = mongoose.model('adminlogin', adminloginSchema);
+module.exports = adminlogin;
+
+app.post('/adminlogin', async (req, res) => {
+  const { email, password } = req.body;
+
+  if (!email || !password) {
+    return res.status(400).json({ message: 'Email and password are required' });
+  }
+
+  try {
+    const user = await adminlogin.findOne({ email });
+
+    if (!user) {
+      console.log('User not found');
+      return res.status(401).json({ message: 'Invalid email or password' });
+    }
+
+    // Log the passwords for debugging purposes
+    console.log('Provided password:', password);
+    console.log('Stored password:', user.password);
+
+    if (password !== user.password) {
+      console.log('Password mismatch');
+      return res.status(401).json({ message: 'Invalid email or password' });
+    }
+
+    console.log('Login successful');
+    res.status(200).json({ message: 'Login successful' });
+  } catch (error) {
+    console.error('Error logging in:', error);
+    res.status(500).json({ message: 'Error logging in', error: error.message });
+  }
+});
+
+
+
+
+
+
+
 
 
 
